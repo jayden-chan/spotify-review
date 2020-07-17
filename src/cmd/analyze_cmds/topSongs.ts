@@ -37,7 +37,13 @@ export const builder: BuilderCallback<CommandArgs, any> = (yargs) => {
 };
 
 export async function handler(argv: Arguments<CommandArgs>) {
-  const db = new PromiseDB(argv.db);
+  let db;
+  try {
+    db = new PromiseDB(argv.db, true);
+  } catch (e) {
+    console.error(`Error: ${e.message}`);
+    return;
+  }
 
   if (!["plays", "time"].includes(argv.sort)) {
     console.error(

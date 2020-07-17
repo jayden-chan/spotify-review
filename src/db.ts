@@ -1,9 +1,13 @@
 import * as sqlite3 from "sqlite3";
+import { existsSync } from "fs";
 
 export default class PromiseDB {
   db: sqlite3.Database;
 
-  constructor(path: string) {
+  constructor(path: string, verify?: boolean) {
+    if (verify && !existsSync(path)) {
+      throw new Error(`Database file "${path}" does not exist.`);
+    }
     this.db = new sqlite3.Database(path);
   }
 
