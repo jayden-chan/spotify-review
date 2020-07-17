@@ -9,6 +9,7 @@ export const aliases = [];
 type CommandArgs = {
   limit: number;
   db: string;
+  sort: string;
   year?: number;
 };
 
@@ -23,6 +24,11 @@ export const builder: BuilderCallback<CommandArgs, any> = (yargs) => {
       describe: "Number of results to return",
       default: 25,
     })
+    .option("sort", {
+      type: "string",
+      describe: 'Which column to sort on (either "plays" or "time")',
+      default: "time",
+    })
     .option("year", {
       type: "number",
       describe: "Return top songs for the provided year only",
@@ -31,6 +37,15 @@ export const builder: BuilderCallback<CommandArgs, any> = (yargs) => {
 
 export async function handler(argv: Arguments<CommandArgs>) {
   const db = new PromiseDB(argv.db);
+
+  if (argv.sort && !["plays", "time"].includes(argv.sort)) {
+    console.error(
+      'Error: "sort" option must be one of either "plays" or "time"'
+    );
+    return;
+  }
+
+  const sortCol = argv.sort === "plays" ? "plays" : "mins_played";
 
   const query = `
   SELECT
@@ -49,7 +64,7 @@ export async function handler(argv: Arguments<CommandArgs>) {
     title,
     artist
   ORDER BY
-    plays DESC
+    ${sortCol} DESC
   LIMIT ${argv.limit}
   `;
 
