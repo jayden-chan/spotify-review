@@ -2,8 +2,8 @@ import { Arguments, BuilderCallback } from "yargs";
 import { MS_TO_HR, MS_TO_MIN } from "../../constants";
 import PromiseDB from "../../db";
 
-export const command = "topSongs [db]";
-export const desc = "Show the top songs";
+export const command = "topAlbums [db]";
+export const desc = "Show the top albums";
 export const aliases = [];
 
 type CommandArgs = {
@@ -49,7 +49,7 @@ export async function handler(argv: Arguments<CommandArgs>) {
   const sortCol = argv.sort === "plays" ? "plays" : "minutes_played";
   const query = `
   SELECT
-    track_name,
+    album,
     artist,
     COUNT(ms_played) AS plays,
     ROUND(CAST(SUM(ms_played) AS REAL) / ${MS_TO_MIN}, 0) AS minutes_played,
@@ -61,8 +61,8 @@ export async function handler(argv: Arguments<CommandArgs>) {
       argv.year ? ` AND strftime('%Y', ts) = '${argv.year}'` : ""
     }
   GROUP BY
-    track_name,
-    artist
+    artist,
+    album
   ORDER BY
     ${sortCol} DESC
   LIMIT ${argv.limit}

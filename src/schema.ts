@@ -1,6 +1,12 @@
-export const schema: {
-  [key: string]: { type: string; sql?: string; sqlname?: string };
-} = {
+type Schema = {
+  [key: string]: {
+    type: string;
+    sql?: string;
+    sqlname?: string;
+  };
+};
+
+export const schema: Schema = {
   ts: { type: "string", sql: "TIMESTAMP WITH TIME ZONE" },
   username: { type: "string" },
   platform: { type: "string" },

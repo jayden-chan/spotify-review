@@ -46,13 +46,13 @@ export async function handler(argv: Arguments<CommandArgs>) {
     return;
   }
 
-  const sortCol = argv.sort === "plays" ? "plays" : "minutes";
+  const sortCol = argv.sort === "plays" ? "plays" : "minutes_played";
   const query = `
   SELECT
     artist,
     COUNT(ms_played) AS plays,
-    ROUND(CAST(SUM(ms_played) AS REAL) / ${MS_TO_MIN}, 0) AS minutes,
-    ROUND(CAST(SUM(ms_played) AS REAL) / ${MS_TO_HR}, 2) AS hours
+    ROUND(CAST(SUM(ms_played) AS REAL) / ${MS_TO_MIN}, 0) AS minutes_played,
+    ROUND(CAST(SUM(ms_played) AS REAL) / ${MS_TO_HR}, 2) AS hours_played
   FROM
     endsong
   WHERE

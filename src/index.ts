@@ -25,7 +25,7 @@ yargs
   .help("help")
   .alias("help", "h")
   .showHelpOnFail(true)
-  // @ts-ignore
+  // @ts-ignore -- typedef is incorrect here
   .parse(process.argv.slice(2), (_, argv, output) => {
     if (argv.version === true && !argv._.length) {
       console.log(version);
