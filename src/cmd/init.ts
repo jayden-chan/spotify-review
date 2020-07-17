@@ -43,6 +43,14 @@ function prepareCreateStatement(): string {
 }
 
 export async function handler(argv: Arguments<CommandArgs>) {
+  if (fs.existsSync(argv.dbFile)) {
+    console.error(`Error: Database file ${argv.dbFile} already exists.`);
+    console.error(
+      "If you want to re-initialize the database, please delete the old file."
+    );
+    return;
+  }
+
   const db = new PromiseDB(argv.dbFile);
 
   console.log("Initializing database...");

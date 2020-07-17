@@ -29,8 +29,6 @@ export async function handler(argv: Arguments<CommandArgs>) {
     endsong
   WHERE
     track_name IS NOT NULL
-    AND reason_end = 'trackdone'
-    AND strftime('%Y', ts) IN ('2017', '2018', '2019')
   GROUP BY
     year
   ORDER BY
