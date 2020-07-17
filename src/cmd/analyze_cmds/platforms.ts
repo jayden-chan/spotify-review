@@ -1,5 +1,5 @@
 import { Arguments, BuilderCallback } from "yargs";
-import { MS_TO_MIN } from "../../constants";
+import { MS_TO_MIN, MS_TO_HR } from "../../constants";
 import PromiseDB from "../../db";
 
 export const command = "platforms [db]";
@@ -24,7 +24,8 @@ export async function handler(argv: Arguments<CommandArgs>) {
   const query = `
   SELECT
     platform,
-    SUM(ms_played) / ${MS_TO_MIN} AS minutes_listened
+    SUM(ms_played) / ${MS_TO_MIN} AS minutes_listened,
+    ROUND(CAST(SUM(ms_played) AS REAL) / ${MS_TO_HR}, 2) AS hours_listened
   FROM
     endsong
   WHERE
