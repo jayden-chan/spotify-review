@@ -2,6 +2,8 @@ import { Arguments, BuilderCallback } from "yargs";
 import { MONTH_NAMES } from "../../constants";
 import PromiseDB from "../../db";
 
+const SEPERATOR = "__spotify-review-sep__";
+
 export const command = "monthlyTopArtists <year> [db]";
 export const desc = "Show the top artists of each month for the given year";
 export const aliases = [];
@@ -63,7 +65,7 @@ export async function handler(argv: Arguments<CommandArgs>) {
       artists_per_month
   )
   SELECT
-    GROUP_CONCAT(artist, ', ') AS top_${n}_artists,
+    GROUP_CONCAT(artist, '${SEPERATOR}') AS top_${n}_artists,
     month
   FROM
     ranks
@@ -80,6 +82,7 @@ export async function handler(argv: Arguments<CommandArgs>) {
     console.table(
       rows.map((row) => {
         row.month = MONTH_NAMES[row.month - 1];
+        row[`top_${n}_artists`] = row[`top_${n}_artists`].split(SEPERATOR);
         return row;
       })
     );
