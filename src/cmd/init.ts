@@ -1,8 +1,8 @@
 import { Arguments, BuilderCallback } from "yargs";
-import * as sqlite3 from "sqlite3";
 import * as fs from "fs";
 import * as readline from "readline";
 import { schema } from "../schema";
+import PromiseDB from "../db";
 
 export const command = "init <data>";
 export const desc = "Initialize the SQLite3 database";
@@ -43,7 +43,7 @@ function prepareCreateStatement(): string {
 }
 
 export async function handler(argv: Arguments<CommandArgs>) {
-  const db = new sqlite3.Database(argv.dbFile);
+  const db = new PromiseDB(argv.dbFile);
 
   console.log("Initializing database...");
   db.run(prepareCreateStatement());
@@ -65,6 +65,10 @@ export async function handler(argv: Arguments<CommandArgs>) {
       .map(([key, meta]) => {
         const val = json[key];
         if (val !== undefined) {
+          if (key === "ts") {
+            return `'${val.replace(" UTC", "Z")}'`;
+          }
+
           switch (meta.type) {
             case "boolean":
             case "number":
@@ -82,7 +86,12 @@ export async function handler(argv: Arguments<CommandArgs>) {
   }
 
   console.log(`Inserting ${rows.length} rows...`);
-  db.run(`${prelude}${rows.join(",\n")};`);
-  db.close();
-  console.log("Finished.");
+  try {
+    await db.run(`${prelude}${rows.join(",\n")};`);
+    await db.close();
+    console.log("Finished.");
+  } catch (err) {
+    console.error("Failed to insert rows:");
+    console.error(err);
+  }
 }

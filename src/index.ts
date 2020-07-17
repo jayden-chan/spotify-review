@@ -17,7 +17,7 @@ const options = {
 
 yargs
   .usage(USAGE_MSG)
-  .commandDir("cmd")
+  .commandDir("cmd", { recurse: true })
   .scriptName("spotify-review")
   .recommendCommands()
   .options(options)
