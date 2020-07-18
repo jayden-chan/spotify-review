@@ -1,6 +1,5 @@
 import { Arguments, BuilderCallback } from "yargs";
-import { MS_TO_HR, MS_TO_MIN } from "../../constants";
-import PromiseDB from "../../db";
+import Queries from "../../queries";
 
 export const command = "topSongs [db]";
 export const desc = "Show the top songs";
@@ -37,14 +36,6 @@ export const builder: BuilderCallback<CommandArgs, any> = (yargs) => {
 };
 
 export async function handler(argv: Arguments<CommandArgs>) {
-  let db;
-  try {
-    db = new PromiseDB(argv.db, true);
-  } catch (e) {
-    console.error(`Error: ${e.message}`);
-    return;
-  }
-
   if (!["plays", "time"].includes(argv.sort)) {
     console.error(
       'Error: "sort" option must be one of either "plays" or "time"'
@@ -52,32 +43,9 @@ export async function handler(argv: Arguments<CommandArgs>) {
     return;
   }
 
-  const sortCol = argv.sort === "plays" ? "plays" : "minutes_played";
-  const query = `
-  SELECT
-    track_name,
-    artist,
-    COUNT(ms_played) AS plays,
-    ROUND(CAST(SUM(ms_played) AS REAL) / ${MS_TO_MIN}, 0) AS minutes_played,
-    ROUND(CAST(SUM(ms_played) AS REAL) / ${MS_TO_HR}, 2) AS hours_played
-  FROM
-    endsong
-  WHERE
-    track_name IS NOT NULL${
-      argv.year ? ` AND strftime('%Y', ts) = '${argv.year}'` : ""
-    }
-  GROUP BY
-    track_name,
-    artist
-  ORDER BY
-    ${sortCol} DESC
-  LIMIT ${argv.limit}
-  `;
-
   try {
-    const rows = await db.all(query);
-    console.table(rows);
-    await db.close();
+    const queries = new Queries(argv.db);
+    console.table(await queries.topSongs(argv.sort, argv.limit, argv.year));
   } catch (err) {
     console.error("Failed to execute query:");
     console.error(err);

@@ -82,7 +82,9 @@ export async function handler(argv: Arguments<CommandArgs>) {
     console.table(
       rows.map((row) => {
         row.month = MONTH_NAMES[row.month - 1];
-        row[`top_${n}_artists`] = row[`top_${n}_artists`].split(SEPERATOR);
+        row[`top_${n}_artists`] = row[`top_${n}_artists`]
+          .split(SEPERATOR)
+          .join(", ");
         return row;
       })
     );
