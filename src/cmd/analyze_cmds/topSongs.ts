@@ -1,5 +1,6 @@
 import { Arguments, BuilderCallback } from "yargs";
 import Queries from "../../queries";
+import { handleQueryError } from "../../util";
 
 export const command = "topSongs [db]";
 export const desc = "Show the top songs";
@@ -12,7 +13,7 @@ type CommandArgs = {
   year?: number;
 };
 
-export const builder: BuilderCallback<CommandArgs, any> = (yargs) => {
+export const builder: BuilderCallback<CommandArgs, never> = (yargs) => {
   yargs
     .positional("db", {
       describe: "Path to SQLite3 db file",
@@ -47,7 +48,6 @@ export async function handler(argv: Arguments<CommandArgs>) {
     const queries = new Queries(argv.db);
     console.table(await queries.topSongs(argv.sort, argv.limit, argv.year));
   } catch (err) {
-    console.error("Failed to execute query:");
-    console.error(err);
+    handleQueryError(err);
   }
 }

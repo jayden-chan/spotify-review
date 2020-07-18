@@ -1,6 +1,6 @@
 import { Arguments, BuilderCallback } from "yargs";
-import { MS_TO_MIN } from "../../constants";
-import PromiseDB from "../../db";
+import Queries from "../../queries";
+import { handleQueryError } from "../../util";
 
 export const command = "minutesListened [db]";
 export const desc = "Show minutes listened per year";
@@ -10,7 +10,7 @@ type CommandArgs = {
   db: string;
 };
 
-export const builder: BuilderCallback<CommandArgs, any> = (yargs) => {
+export const builder: BuilderCallback<CommandArgs, never> = (yargs) => {
   yargs.positional("db", {
     describe: "Path to SQLite3 db file",
     type: "string",
@@ -19,40 +19,13 @@ export const builder: BuilderCallback<CommandArgs, any> = (yargs) => {
 };
 
 export async function handler(argv: Arguments<CommandArgs>) {
-  let db;
   try {
-    db = new PromiseDB(argv.db, true);
-  } catch (e) {
-    console.error(`Error: ${e.message}`);
-    return;
-  }
-
-  const query = `
-  SELECT
-    strftime('%Y', ts) AS year,
-    SUM(ms_played) / ${MS_TO_MIN} AS minutes_listened
-  FROM
-    endsong
-  WHERE
-    track_name IS NOT NULL
-  GROUP BY
-    year
-  ORDER BY
-    year DESC
-  `;
-
-  try {
-    const rows = await db.all(query);
-    console.table(rows);
     console.log(
-      `Total Minutes: ${rows.reduce(
-        (prev, curr) => prev + curr.minutes_listened,
-        0
-      )}`
+      "Note about minutes listened: https://github.com/jayden-chan/spotify-review#Notes"
     );
-    await db.close();
+    const queries = new Queries(argv.db);
+    console.table(await queries.minutesListened());
   } catch (err) {
-    console.error("Failed to execute query:");
-    console.error(err);
+    handleQueryError(err);
   }
 }

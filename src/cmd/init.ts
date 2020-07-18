@@ -13,7 +13,7 @@ type CommandArgs = {
   data: string;
 };
 
-export const builder: BuilderCallback<CommandArgs, any> = (yargs) => {
+export const builder: BuilderCallback<CommandArgs, never> = (yargs) => {
   yargs
     .positional("data", {
       describe: "Path to EndSong.json",

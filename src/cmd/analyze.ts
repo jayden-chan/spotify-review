@@ -6,7 +6,7 @@ export const aliases = [];
 
 type CommandArgs = {};
 
-export const builder: BuilderCallback<CommandArgs, any> = (yargs) => {
+export const builder: BuilderCallback<CommandArgs, never> = (yargs) => {
   return yargs.commandDir("analyze_cmds");
 };
 
