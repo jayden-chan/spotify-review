@@ -9,15 +9,15 @@ export const desc = "Initialize the SQLite3 database";
 export const aliases = [];
 
 type CommandArgs = {
-  dbFile: string;
   data: string;
+  dbFile: string;
 };
 
 export const builder: BuilderCallback<CommandArgs, never> = (yargs) => {
   yargs
     .positional("data", {
-      describe: "Path to EndSong.json",
       type: "string",
+      describe: "Path to EndSong.json",
     })
     .option("dbFile", {
       type: "string",

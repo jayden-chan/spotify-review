@@ -7,7 +7,10 @@ export type Platforms = {
   hours_listened: number;
 }[];
 
-export async function platforms(db: PromiseDB): Promise<Platforms> {
+export async function platforms(
+  db: PromiseDB,
+  limit: number
+): Promise<Platforms> {
   const query = `
   SELECT
     platform,
@@ -22,6 +25,7 @@ export async function platforms(db: PromiseDB): Promise<Platforms> {
     platform
   ORDER BY
     minutes_listened DESC
+  LIMIT ${limit}
   `;
 
   return await db.all(query);

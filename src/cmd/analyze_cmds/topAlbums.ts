@@ -7,8 +7,8 @@ export const desc = "Show the top albums";
 export const aliases = [];
 
 type CommandArgs = {
-  limit: number;
   db: string;
+  limit: number;
   sort: string;
   year?: number;
 };
@@ -16,8 +16,8 @@ type CommandArgs = {
 export const builder: BuilderCallback<CommandArgs, never> = (yargs) => {
   yargs
     .positional("db", {
-      describe: "Path to SQLite3 db file",
       type: "string",
+      describe: "Path to SQLite3 db file",
       default: "./spotify-review.db",
     })
     .option("limit", {

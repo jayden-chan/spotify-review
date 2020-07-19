@@ -12,8 +12,8 @@ type CommandArgs = {
 
 export const builder: BuilderCallback<CommandArgs, never> = (yargs) => {
   yargs.positional("db", {
-    describe: "Path to SQLite3 db file",
     type: "string",
+    describe: "Path to SQLite3 db file",
     default: "./spotify-review.db",
   });
 };

@@ -15,12 +15,12 @@ type CommandArgs = {
 export const builder: BuilderCallback<CommandArgs, never> = (yargs) => {
   yargs
     .positional("year", {
-      describe: "The year to analyze",
       type: "number",
+      describe: "The year to analyze",
     })
     .positional("db", {
-      describe: "Path to SQLite3 db file",
       type: "string",
+      describe: "Path to SQLite3 db file",
       default: "./spotify-review.db",
     })
     .option("limit", {

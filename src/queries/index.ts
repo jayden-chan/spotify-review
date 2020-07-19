@@ -38,8 +38,8 @@ export default class Queries {
     return await topAlbums(this.db, sort, limit, year);
   }
 
-  async platforms(): Promise<Platforms> {
-    return await platforms(this.db);
+  async platforms(limit: number): Promise<Platforms> {
+    return await platforms(this.db, limit);
   }
 
   async monthlyTopArtists(
