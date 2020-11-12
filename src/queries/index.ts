@@ -4,6 +4,7 @@ import { topAlbums, TopAlbums } from "./topAlbums";
 import { platforms, Platforms } from "./platforms";
 import { monthlyTopArtists, MonthlyTopArtists } from "./monthlyTopArtists";
 import { minutesListened, MinutesListened } from "./minutesListened";
+import { heatmap, Heatmap } from "./heatmap";
 
 import PromiseDB from "../db";
 
@@ -19,7 +20,7 @@ export default class Queries {
     limit: number,
     year?: number
   ): Promise<TopSongs> {
-    return await topSongs(this.db, sort, limit, year);
+    return topSongs(this.db, sort, limit, year);
   }
 
   async topArtists(
@@ -27,7 +28,7 @@ export default class Queries {
     limit: number,
     year?: number
   ): Promise<TopArtists> {
-    return await topArtists(this.db, sort, limit, year);
+    return topArtists(this.db, sort, limit, year);
   }
 
   async topAlbums(
@@ -35,21 +36,25 @@ export default class Queries {
     limit: number,
     year?: number
   ): Promise<TopAlbums> {
-    return await topAlbums(this.db, sort, limit, year);
+    return topAlbums(this.db, sort, limit, year);
   }
 
   async platforms(limit: number): Promise<Platforms> {
-    return await platforms(this.db, limit);
+    return platforms(this.db, limit);
   }
 
   async monthlyTopArtists(
     year: number,
     limit: number
   ): Promise<MonthlyTopArtists> {
-    return await monthlyTopArtists(this.db, year, limit);
+    return monthlyTopArtists(this.db, year, limit);
   }
 
   async minutesListened(): Promise<MinutesListened> {
-    return await minutesListened(this.db);
+    return minutesListened(this.db);
+  }
+
+  async heatmap(year: number): Promise<Heatmap> {
+    return heatmap(this.db, year);
   }
 }

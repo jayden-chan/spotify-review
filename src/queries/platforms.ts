@@ -28,5 +28,5 @@ export async function platforms(
   LIMIT ${limit}
   `;
 
-  return await db.all(query);
+  return db.all(query);
 }

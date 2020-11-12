@@ -32,5 +32,5 @@ export async function topArtists(
   LIMIT ${limit}
   `;
 
-  return await db.all(query);
+  return db.all(query);
 }

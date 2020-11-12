@@ -21,7 +21,7 @@ export const builder: BuilderCallback<CommandArgs, never> = (yargs) => {
 export async function handler(argv: Arguments<CommandArgs>) {
   try {
     console.log(
-      "Note about minutes listened: https://github.com/jayden-chan/spotify-review#Notes"
+      "\nNote about minutes listened: https://github.com/jayden-chan/spotify-review#Notes\n"
     );
     const queries = new Queries(argv.db);
     console.table(await queries.minutesListened());

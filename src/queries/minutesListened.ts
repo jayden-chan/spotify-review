@@ -21,5 +21,5 @@ export async function minutesListened(db: PromiseDB): Promise<MinutesListened> {
     year DESC
   `;
 
-  return await db.all(query);
+  return db.all(query);
 }

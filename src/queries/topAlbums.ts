@@ -35,5 +35,5 @@ export async function topAlbums(
   LIMIT ${limit}
   `;
 
-  return await db.all(query);
+  return db.all(query);
 }

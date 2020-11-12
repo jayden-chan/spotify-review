@@ -35,5 +35,5 @@ export async function topSongs(
   LIMIT ${limit}
   `;
 
-  return await db.all(query);
+  return db.all(query);
 }
