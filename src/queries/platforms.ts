@@ -7,6 +7,13 @@ export type Platforms = {
   hours_listened: number;
 }[];
 
+export type MappedPlatforms = {
+  mappedPlatform?: string;
+  platform: string;
+  minutes_listened: number;
+  hours_listened: number;
+}[];
+
 export async function platforms(
   db: PromiseDB,
   limit: number
@@ -28,5 +35,28 @@ export async function platforms(
   LIMIT ${limit}
   `;
 
-  return db.all(query);
+  const mappedResults: MappedPlatforms = [];
+  const result: Platforms = await db.all(query);
+  result.forEach((row) => {
+    const matches = /\((.*?)\)/.exec(row.platform);
+    if (matches) {
+      const [, platform] = matches;
+      const matchingRow = mappedResults.find(
+        (r) => r.mappedPlatform === platform
+      );
+      if (matchingRow) {
+        matchingRow.minutes_listened += row.minutes_listened;
+        matchingRow.hours_listened += row.hours_listened;
+      } else {
+        mappedResults.push({ ...row, mappedPlatform: platform });
+      }
+    } else {
+      mappedResults.push(row);
+    }
+  });
+
+  return mappedResults.map((r) => {
+    delete r.mappedPlatform;
+    return { ...r, hours_listened: Number(r.hours_listened.toFixed(2)) };
+  });
 }
