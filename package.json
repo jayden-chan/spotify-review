@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "sqlite3": "^5.0.0",
-    "svg-heatmap": "^1.0.2",
+    "svg-heatmap": "^1.0.3",
     "yargs": "^15.4.1"
   }
 }

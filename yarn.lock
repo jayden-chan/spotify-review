@@ -924,10 +924,10 @@ strip-json-comments@~2.0.1:
   resolved "https://registry.yarnpkg.com/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
   integrity sha1-PFMZQukIwml8DsNEhYwobHygpgo=
 
-svg-heatmap@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/svg-heatmap/-/svg-heatmap-1.0.2.tgz#66e2e149862d2288928dbd0f284838dd8d7fd788"
-  integrity sha512-aD0DU1otucnu6C/+AHxgDnATFDhZB7Cdoqt85cISESj2lG6gZylI6mAYtAkySRO+odZiCETN5JjTwVYEE7bp6w==
+svg-heatmap@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/svg-heatmap/-/svg-heatmap-1.0.3.tgz#2f3815c5b6e0222cd8a22cc25b2b396101c6b39c"
+  integrity sha512-PtbraIZwRNiJ8NKBVktLhgoGlBNQWWchh45ZfRcPkSDMvP/TNX1/MYrwilzL7Kh31e2GQNSUifs8L1KPiZ5QAQ==
   dependencies:
     date-fns "^2.16.1"
 
