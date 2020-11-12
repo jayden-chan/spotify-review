@@ -7,7 +7,7 @@ import { handleQueryError } from "../../util";
 
 const writeFile = promisify(writeFileCallback);
 
-export const command = "heatmap <path> [year] [db]";
+export const command = "heatmap <path> [db]";
 export const desc = "Generate a listening heatmap for the given year";
 export const aliases = [];
 
@@ -23,15 +23,15 @@ export const builder: BuilderCallback<CommandArgs, never> = (yargs) => {
       type: "string",
       describe: "Path of the output svg file",
     })
-    .positional("year", {
-      type: "number",
-      describe: "The year to analyze",
-      default: 2019,
-    })
     .positional("db", {
       type: "string",
       describe: "Path to SQLite3 db file",
       default: "./spotify-review.db",
+    })
+    .option("year", {
+      type: "number",
+      describe: "The year to analyze",
+      default: 2019,
     });
 };
 
@@ -58,13 +58,10 @@ export async function handler(argv: Arguments<CommandArgs>) {
   try {
     const queries = new Queries(argv.db);
     const data = await queries.heatmap(argv.year);
-    const svg = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n${generateSVG(
-      data.heatmap,
-      argv.year,
-      palette
-    )}`;
+    const header = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n';
+    const svg = generateSVG(data.heatmap, argv.year, palette);
 
-    await writeFile(argv.path, svg, { encoding: "utf8" });
+    await writeFile(argv.path, header + svg, { encoding: "utf8" });
   } catch (err) {
     handleQueryError(err);
   }

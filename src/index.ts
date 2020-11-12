@@ -21,6 +21,7 @@ yargs
   .commandDir("cmd")
   .scriptName("spotify-review")
   .recommendCommands()
+  .demandCommand()
   .options(options)
   .version(false)
   .help("help")
