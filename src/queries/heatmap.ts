@@ -32,7 +32,7 @@ export async function heatmap(db: PromiseDB, year: number): Promise<Heatmap> {
       return 0;
     } else {
       resultIdx += 1;
-      return Math.round((results[resultIdx - 1].total_ms / max) * 16);
+      return Math.ceil((results[resultIdx - 1].total_ms / max) * 16);
     }
   });
   return { heatmap };
