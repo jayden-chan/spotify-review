@@ -3,6 +3,8 @@ import * as fs from "fs";
 import * as readline from "readline";
 import { schema } from "../schema";
 import PromiseDB from "../db";
+import { join } from "path";
+import { readFile } from "fs/promises";
 
 export const command = "init <data>";
 export const desc = "Initialize the SQLite3 database";
@@ -11,20 +13,51 @@ export const aliases = [];
 type CommandArgs = {
   data: string;
   dbFile: string;
+  newFormat: boolean;
 };
 
 export const builder: BuilderCallback<CommandArgs, never> = (yargs) => {
   yargs
     .positional("data", {
       type: "string",
-      describe: "Path to EndSong.json",
+      describe: "Path to EndSong.json or folder with endsong_0 to endsong_N",
     })
     .option("dbFile", {
       type: "string",
       describe: "Path to the SQLite3 database file",
       default: "./spotify-review.db",
+    })
+    .option("newFormat", {
+      type: "boolean",
+      describe: "Use the new end_song format (endsong_0 to endsong_N)",
+      default: false,
     });
 };
+
+function getRow(json: any) {
+  const row = Object.entries(schema)
+    .map(([key, meta]) => {
+      const val = json[key];
+      if (val !== undefined && val !== null) {
+        if (key === "ts") {
+          return `'${val.replace(" UTC", "Z")}'`;
+        }
+
+        switch (meta.type) {
+          case "boolean":
+          case "number":
+            return val;
+          case "string":
+            return `'${val.replace(/'/g, "''")}'`;
+        }
+      } else {
+        return "NULL";
+      }
+    })
+    .join(", ");
+
+  return row;
+}
 
 function prepareCreateStatement(): string {
   return `CREATE TABLE endsong (\n${Object.entries(schema)
@@ -56,45 +89,52 @@ export async function handler(argv: Arguments<CommandArgs>) {
   console.log("Initializing database...");
   db.run(prepareCreateStatement());
 
-  console.log("Reading EndSong.json...");
-  const rl = readline.createInterface({
-    input: fs.createReadStream(argv.data),
-  });
-
-  const prelude = `INSERT INTO endsong(${Object.entries(schema)
-    .map(([key, meta]) => meta.sqlname ?? key)
-    .join(",")}) VALUES\n`;
-
   const rows = [];
 
-  for await (const line of rl) {
-    const json = JSON.parse(line);
-    const row = Object.entries(schema)
-      .map(([key, meta]) => {
-        const val = json[key];
-        if (val !== undefined) {
-          if (key === "ts") {
-            return `'${val.replace(" UTC", "Z")}'`;
-          }
+  if (argv.newFormat) {
+    let n = 0;
+    while (true) {
+      const path = join(argv.data, `endsong_${n}.json`);
 
-          switch (meta.type) {
-            case "boolean":
-            case "number":
-              return val;
-            case "string":
-              return `'${val.replace(/'/g, "''")}'`;
-          }
-        } else {
-          return "NULL";
+      console.log(`Reading endsong_${n}.json`);
+
+      if (fs.existsSync(path)) {
+        const contents = await readFile(path, { encoding: "utf8" });
+        const json = JSON.parse(contents);
+        if (!Array.isArray(json)) {
+          throw new Error(`ERROR: parsed JSON isn't an array (${path})`);
         }
-      })
-      .join(", ");
 
-    rows.push(`(${row})`);
+        for (const line of json) {
+          const row = getRow(line);
+          rows.push(`(${row})`);
+        }
+
+        n += 1;
+      } else {
+        break;
+      }
+    }
+  } else {
+    console.log("Reading EndSong.json...");
+    const rl = readline.createInterface({
+      input: fs.createReadStream(argv.data),
+    });
+
+    for await (const line of rl) {
+      const json = JSON.parse(line);
+      const row = getRow(json);
+      rows.push(`(${row})`);
+    }
   }
 
   console.log(`Inserting ${rows.length} rows...`);
+
   try {
+    const prelude = `INSERT INTO endsong(${Object.entries(schema)
+      .map(([key, meta]) => meta.sqlname ?? key)
+      .join(",")}) VALUES\n`;
+
     await db.run(`${prelude}${rows.join(",\n")};`);
     await db.close();
     console.log("Finished.");
