@@ -1,6 +1,6 @@
 import { Arguments, BuilderCallback } from "yargs";
 import Queries from "../../queries";
-import { handleQueryError } from "../../util";
+import { handleQueryError, printData } from "../../util";
 
 export const command = "topSongs [db]";
 export const desc = "Show the top songs";
@@ -10,6 +10,7 @@ type CommandArgs = {
   db: string;
   limit: number;
   sort: string;
+  format: string;
   year?: number;
 };
 
@@ -19,6 +20,11 @@ export const builder: BuilderCallback<CommandArgs, never> = (yargs) => {
       type: "string",
       describe: "Path to SQLite3 db file",
       default: "./spotify-review.db",
+    })
+    .option("format", {
+      type: "string",
+      describe: "Output format. Either `table` or `csv`",
+      default: "table",
     })
     .option("limit", {
       type: "number",
@@ -46,7 +52,10 @@ export async function handler(argv: Arguments<CommandArgs>) {
 
   try {
     const queries = new Queries(argv.db);
-    console.table(await queries.topSongs(argv.sort, argv.limit, argv.year));
+    printData(
+      await queries.topSongs(argv.sort, argv.limit, argv.year),
+      argv.format
+    );
   } catch (err) {
     handleQueryError(err);
   }

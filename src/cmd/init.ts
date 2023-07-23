@@ -96,9 +96,8 @@ export async function handler(argv: Arguments<CommandArgs>) {
     while (true) {
       const path = join(argv.data, `endsong_${n}.json`);
 
-      console.log(`Reading endsong_${n}.json`);
-
       if (fs.existsSync(path)) {
+        console.log(`Reading endsong_${n}.json`);
         const contents = await readFile(path, { encoding: "utf8" });
         const json = JSON.parse(contents);
         if (!Array.isArray(json)) {
