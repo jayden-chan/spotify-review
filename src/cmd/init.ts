@@ -1,10 +1,10 @@
-import { Arguments, BuilderCallback } from "yargs";
 import * as fs from "fs";
-import * as readline from "readline";
-import { schema } from "../schema";
-import PromiseDB from "../db";
+import { readdir, readFile } from "fs/promises";
 import { join } from "path";
-import { readFile } from "fs/promises";
+import * as readline from "readline";
+import { Arguments, BuilderCallback } from "yargs";
+import PromiseDB from "../db";
+import { schema } from "../schema";
 
 export const command = "init <data>";
 export const desc = "Initialize the SQLite3 database";
@@ -92,26 +92,27 @@ export async function handler(argv: Arguments<CommandArgs>) {
   const rows = [];
 
   if (argv.newFormat) {
-    let n = 0;
-    while (true) {
-      const path = join(argv.data, `endsong_${n}.json`);
+    const files = await readdir(argv.data);
+    files.sort((a, b) => a.localeCompare(b));
+    console.log(files);
 
-      if (fs.existsSync(path)) {
-        console.log(`Reading endsong_${n}.json`);
-        const contents = await readFile(path, { encoding: "utf8" });
-        const json = JSON.parse(contents);
-        if (!Array.isArray(json)) {
-          throw new Error(`ERROR: parsed JSON isn't an array (${path})`);
-        }
+    for (const file of files) {
+      const path = join(argv.data, file);
 
-        for (const line of json) {
-          const row = getRow(line);
-          rows.push(`(${row})`);
-        }
+      if (!path.endsWith(".json")) {
+        continue;
+      }
 
-        n += 1;
-      } else {
-        break;
+      console.log(`Reading ${path}`);
+      const contents = await readFile(path, { encoding: "utf8" });
+      const json = JSON.parse(contents);
+      if (!Array.isArray(json)) {
+        throw new Error(`ERROR: parsed JSON isn't an array (${path})`);
+      }
+
+      for (const line of json) {
+        const row = getRow(line);
+        rows.push(`(${row})`);
       }
     }
   } else {

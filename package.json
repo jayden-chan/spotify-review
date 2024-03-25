@@ -4,9 +4,6 @@
   "description": "Analyze your Spotify listening data",
   "main": "./dist/src/index.js",
   "bin": "./dist/src/index.js",
-  "engines": {
-    "node": "^18"
-  },
   "scripts": {
     "build": "tsc",
     "prepare": "tsc",
